@@ -3,150 +3,35 @@
 {% block title %}Marketplace | Campus SkillSwap{% endblock %}
 
 {% block content %}
-<div class="hero-panel animate-fade-in">
-    <div class="row align-items-center">
-        <div class="col-lg-7">
-            <h1 class="display-4 fw-bold mb-3">Learn, Earn & Connect</h1>
-            <p class="lead mb-4 opacity-75">The peer-to-peer marketplace for campus experts. Share your skills or find the help you need from fellow students.</p>
-            <div class="d-flex flex-wrap gap-3">
-                {% if not user.is_authenticated %}
-                <a href="{% url 'MainApp:register' %}" class="btn btn-light btn-lg text-primary">Get Started</a>
-                {% endif %}
-                <a href="#marketplace" class="btn btn-outline-light btn-lg">Browse Skills</a>
-            </div>
-        </div>
-        <div class="col-lg-5 d-none d-lg-block text-end">
-            <div class="row g-3">
-                <div class="col-6">
-                    <div class="card bg-white bg-opacity-10 border-0 p-3 text-center">
-                        <div class="h2 mb-0 fw-bold">{{ total_skills }}</div>
-                        <div class="small opacity-75">Skills Shared</div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="card bg-white bg-opacity-10 border-0 p-3 text-center">
-                        <div class="h2 mb-0 fw-bold">{{ available_count }}</div>
-                        <div class="small opacity-75">Active Now</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h3">Student Marketplace</h1>
+        <p class="text-muted">Browse available skills and services posted by other students.</p>
     </div>
+    {% if user.is_authenticated %}
+    <a class="btn btn-success" href="{% url 'MainApp:skill_create' %}">Post a Skill</a>
+    {% endif %}
 </div>
 
-<div id="marketplace" class="row g-4 mb-5">
-    <div class="col-12">
-        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
-            <div class="card-body p-4 bg-white">
-                <form method="get" class="row g-3 align-items-end">
-                    <div class="col-md-5">
-                        <label class="form-label small fw-bold text-muted" for="search">Search</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
-                            <input id="search" name="q" value="{{ search_query }}" type="search" class="form-control border-0 bg-light"
-                                placeholder="What are you looking for?">
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label small fw-bold text-muted" for="category">Category</label>
-                        <select id="category" name="category" class="form-select border-0 bg-light">
-                            <option value="">All categories</option>
-                            {% for code, label in categories %}
-                            <option value="{{ code }}" {% if selected_category == code %}selected{% endif %}>{{ label }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label small fw-bold text-muted" for="availability">Availability</label>
-                        <select id="availability" name="availability" class="form-select border-0 bg-light">
-                            <option value="">All statuses</option>
-                            {% for code, label in availability_options %}
-                            <option value="{{ code }}" {% if selected_availability == code %}selected{% endif %}>{{ label }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-1 d-grid">
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-filter"></i></button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-{% if skills %}
-<div class="row g-4 animate-fade-in">
+{% if skills.exists %}
+<div class="row g-3">
     {% for skill in skills %}
-    <div class="col-md-6 col-lg-4">
-        <div class="card h-100 border-0 shadow-sm rounded-4 position-relative">
-            <div class="card-body d-flex flex-column p-4">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <span class="badge bg-primary text-uppercase">{{ skill.get_category_display }}</span>
-                    {% if skill.average_rating > 0 %}
-                    <span class="small fw-bold"><i class="bi bi-star-fill text-warning me-1"></i>{{ skill.average_rating }}</span>
-                    {% endif %}
-                </div>
-                
-                <h5 class="card-title fw-bold mb-2">{{ skill.title }}</h5>
-                <p class="text-muted small mb-4 flex-grow-1">{{ skill.description|truncatewords:20 }}</p>
-                
-                <div class="d-flex align-items-center justify-content-between mt-auto pt-3 border-top">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                            <i class="bi bi-person text-primary"></i>
-                        </div>
-                        <span class="small text-muted fw-500">{{ skill.owner.username }}</span>
-                    </div>
-                    <div class="text-end">
-                        <span class="h6 mb-0 fw-bold text-primary">{{ skill.display_price }}</span>
-                    </div>
-                </div>
-                <a href="{% url 'MainApp:skill_detail' skill.pk %}" class="stretched-link"></a>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ skill.title }}</h5>
+                <p class="card-text">{{ skill.description|truncatewords:25 }}</p>
+                <p class="mb-1"><strong>Category:</strong> {{ skill.get_category_display }}</p>
+                <p class="mb-1"><strong>Price:</strong> {{ skill.display_price }}</p>
+                <p class="mb-1"><strong>Available:</strong> {{ skill.get_availability_status_display }}</p>
+                <p class="mb-1"><strong>Owner:</strong> {{ skill.owner.username }}</p>
+                <a class="stretched-link" href="{% url 'MainApp:skill_detail' skill.pk %}"></a>
             </div>
         </div>
     </div>
     {% endfor %}
 </div>
-
-<!-- Pagination -->
-<nav aria-label="Page navigation" class="mt-5">
-    <ul class="pagination justify-content-center gap-2">
-        {% if skills.has_previous %}
-        <li class="page-item">
-            <a class="page-link border-0 rounded-3 shadow-sm"
-                href="?page=1&q={{ search_query }}&category={{ selected_category }}&availability={{ selected_availability }}"><i class="bi bi-chevron-double-left"></i></a>
-        </li>
-        {% endif %}
-
-        {% for num in skills.paginator.page_range %}
-        {% if skills.number == num %}
-        <li class="page-item"><span class="page-link bg-primary text-white border-0 rounded-3 shadow-sm">{{ num }}</span></li>
-        {% else %}
-        <li class="page-item">
-            <a class="page-link border-0 rounded-3 shadow-sm text-dark"
-                href="?page={{ num }}&q={{ search_query }}&category={{ selected_category }}&availability={{ selected_availability }}">{{
-                num }}</a>
-        </li>
-        {% endif %}
-        {% endfor %}
-
-        {% if skills.has_next %}
-        <li class="page-item">
-            <a class="page-link border-0 rounded-3 shadow-sm"
-                href="?page={{ skills.next_page_number }}&q={{ search_query }}&category={{ selected_category }}&availability={{ selected_availability }}"><i class="bi bi-chevron-right"></i></a>
-        </li>
-        {% endif %}
-    </ul>
-</nav>
 {% else %}
-<div class="text-center py-5">
-    <div class="bg-white rounded-5 p-5 shadow-sm d-inline-block">
-        <i class="bi bi-search text-muted display-1 mb-4"></i>
-        <h3>No skills found</h3>
-        <p class="text-muted">Try adjusting your search or filters to find what you're looking for.</p>
-        <a href="{% url 'MainApp:skill_list' %}" class="btn btn-primary mt-3">Reset Filters</a>
-    </div>
-</div>
+<div class="alert alert-info">No skill posts are available yet. Be the first to post a skill!</div>
 {% endif %}
 {% endblock %}
