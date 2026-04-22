@@ -1,0 +1,49 @@
+{% extends 'mainapp/base.html' %}
+
+{% block title %}{{ form_title }} | Campus SkillSwap{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center animate-fade-in">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-2 p-md-4">
+            <div class="card-body">
+                <div class="mb-4">
+                    <h1 class="fw-bold mb-2">{{ form_title }}</h1>
+                    <p class="text-muted">Fill out the details below to list your skill on the marketplace.</p>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row g-4">
+                        {% for field in form %}
+                        <div class="{% if field.name == 'description' %}col-12{% else %}col-md-6{% endif %}">
+                            <label class="form-label small fw-bold text-muted" for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                            </label>
+                            
+                            {{ field }}
+                            
+                            {% if field.help_text %}
+                            <div class="form-text small opacity-75">{{ field.help_text }}</div>
+                            {% endif %}
+                            
+                            {% for error in field.errors %}
+                            <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mt-5 pt-4 border-top">
+                        <button class="btn btn-primary px-5" type="submit">
+                            <i class="bi bi-check-lg"></i> Save Listing
+                        </button>
+                        <a class="btn btn-light" href="{% url 'MainApp:skill_list' %}">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

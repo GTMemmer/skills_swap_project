@@ -1,0 +1,23 @@
+{% extends 'mainapp/base.html' %}
+
+{% block title %}Delete Skill | Campus SkillSwap{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card rounded-4 shadow-sm p-4">
+            <div class="card-body">
+                <h1 class="mb-3">Delete Skill</h1>
+                <div class="alert alert-warning rounded-4">
+                    Are you sure you want to delete the skill post <strong>{{ skill.title }}</strong>?
+                </div>
+                <form method="post" class="d-flex gap-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, delete</button>
+                    <a class="btn btn-secondary" href="{% url 'MainApp:skill_detail' skill.pk %}">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

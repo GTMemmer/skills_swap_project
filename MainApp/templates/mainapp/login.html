@@ -1,0 +1,63 @@
+{% extends 'mainapp/base.html' %}
+
+{% block title %}Login | Campus SkillSwap{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center animate-fade-in" style="padding-top: 4rem;">
+    <div class="col-md-5 col-lg-4">
+        <div class="card border-0 shadow-lg rounded-5 overflow-hidden">
+            <div class="card-body p-5">
+                <div class="text-center mb-5">
+                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 64px; height: 64px;">
+                        <i class="bi bi-person-lock text-primary h3 mb-0"></i>
+                    </div>
+                    <h2 class="fw-bold mb-1">Welcome Back</h2>
+                    <p class="text-muted small">Access your student marketplace account</p>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next_url }}">
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted" for="username">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0"><i class="bi bi-person text-muted"></i></span>
+                            <input type="text" name="username" class="form-control border-0 bg-light" id="username"
+                                placeholder="Enter username" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted" for="password">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0"><i class="bi bi-shield-lock text-muted"></i></span>
+                            <input type="password" name="password" class="form-control border-0 bg-light" id="password"
+                                placeholder="Enter password" required>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mb-4">
+                        <button class="btn btn-primary btn-lg" type="submit">
+                            Sign In
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center">
+                    <p class="text-muted small mb-0">
+                        Don't have an account?
+                        <a href="{% url 'MainApp:register' %}" class="text-primary fw-bold text-decoration-none">Create one now</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'MainApp:skill_list' %}" class="text-muted small text-decoration-none">
+                <i class="bi bi-arrow-left me-1"></i> Back to Marketplace
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

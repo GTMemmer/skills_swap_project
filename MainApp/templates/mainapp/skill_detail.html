@@ -1,0 +1,192 @@
+{% extends 'mainapp/base.html' %}
+
+{% block title %}{{ skill.title }} | Campus SkillSwap{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h1 class="mb-2">{{ skill.title }}</h1>
+                <p class="text-muted mb-0">
+                    <i class="bi bi-person-circle"></i> Posted by <strong>{{ skill.owner.username }}</strong> on
+                    <strong>{{ skill.created_at|date:'F j, Y' }}</strong>
+                </p>
+                <div class="mt-2">
+                    {% if skill.average_rating > 0 %}
+                    <span class="text-warning">★</span> <strong>{{ skill.average_rating }}</strong> / 5.0
+                    <span class="text-muted small">({{ reviews.count }} review{{ reviews.count|pluralize }})</span>
+                    {% else %}
+                    <span class="text-muted small">No reviews yet</span>
+                    {% endif %}
+                </div>
+            </div>
+            <span class="badge bg-primary">{{ skill.get_availability_status_display }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Description Card -->
+        <div class="card mb-4 shadow-sm border-0 rounded-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">About This Skill</h5>
+                <p class="card-text text-muted">{{ skill.description }}</p>
+            </div>
+        </div>
+
+        <!-- Details Card -->
+        <div class="card mb-4 shadow-sm border-0 rounded-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Details</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-4" style="background: var(--light);">
+                            <p class="text-muted small mb-1">Category</p>
+                            <p class="h6 mb-0"><strong>{{ skill.get_category_display }}</strong></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-4" style="background: var(--light);">
+                            <p class="text-muted small mb-1">Price</p>
+                            <p class="h6 mb-0"><strong>{{ skill.display_price }}</strong></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-4" style="background: var(--light);">
+                            <p class="text-muted small mb-1">Contact Preference</p>
+                            <p class="h6 mb-0"><strong>{{ skill.get_contact_preference_display }}</strong></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-4" style="background: var(--light);">
+                            <p class="text-muted small mb-1">Availability</p>
+                            <p class="h6 mb-0"><strong>{{ skill.get_availability_status_display }}</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="mt-5">
+            <h3 class="mb-4">Reviews & Ratings</h3>
+
+            {% if user.is_authenticated and user != skill.owner and not user_has_reviewed %}
+            <div class="card mb-4 shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Leave a Review</h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Rating</label>
+                            {{ form.rating }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Comment</label>
+                            {{ form.comment }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                    </form>
+                </div>
+            </div>
+            {% elif user == skill.owner %}
+            <div class="alert alert-light border rounded-4 mb-4">
+                You cannot review your own skill.
+            </div>
+            {% elif user_has_reviewed %}
+            <div class="alert alert-success border rounded-4 mb-4">
+                You have already reviewed this skill. Thank you!
+            </div>
+            {% endif %}
+
+            {% if reviews %}
+            <div class="list-group list-group-flush shadow-sm rounded-4 overflow-hidden border">
+                {% for review in reviews %}
+                <div class="list-group-item p-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <div>
+                            <strong class="text-dark">{{ review.user.username }}</strong>
+                            <span class="text-warning ms-2">
+                                {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </span>
+                        </div>
+                        <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                    </div>
+                    <p class="text-muted mb-0">{{ review.comment }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info rounded-4">No reviews yet. Be the first to leave one!</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Owner Card -->
+        <div class="card mb-4 shadow-sm border-0 rounded-4">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <div
+                        style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #0a58ca); margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold;">
+                        {{ skill.owner.username|first|upper }}
+                    </div>
+                </div>
+                <h6 class="mb-1">{{ skill.owner.username }}</h6>
+                <p class="text-muted small mb-3">Skill Provider</p>
+                <button class="btn btn-primary w-100 rounded-3">Contact Provider</button>
+            </div>
+        </div>
+
+        <!-- Skill Info Card -->
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body">
+                <h6 class="card-title mb-3">Quick Info</h6>
+                <div class="mb-3">
+                    <span class="badge bg-primary">{{ skill.get_category_display }}</span>
+                </div>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <small class="text-muted">Posted on</small><br>
+                        <strong>{{ skill.created_at|date:'M d, Y' }}</strong>
+                    </li>
+                    <li>
+                        <small class="text-muted">Price</small><br>
+                        <strong class="text-primary">{{ skill.display_price }}</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+{% if user == skill.owner %}
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="d-flex gap-2">
+            <a class="btn btn-primary px-4" href="{% url 'MainApp:skill_update' skill.pk %}">
+                Edit Skill
+            </a>
+            <a class="btn btn-danger px-4" href="{% url 'MainApp:skill_delete' skill.pk %}">
+                Delete Skill
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Back Link -->
+<div class="row mt-4">
+    <div class="col-12">
+        <a href="{% url 'MainApp:skill_list' %}" class="btn btn-link ps-0">
+            ← Back to Marketplace
+        </a>
+    </div>
+</div>
+{% endblock %}
